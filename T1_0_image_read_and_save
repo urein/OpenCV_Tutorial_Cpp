@@ -1,0 +1,32 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+int main()
+{
+
+	// read image
+	Mat img = imread("./images/lenna.png");
+	//Mat img = imread("./images/lenna.png", IMREAD_GRAYSCALE);  // read gray image
+	if (img.empty()) {
+		cout << "could not load image ..." << endl;
+		return -1;
+	}
+
+	// generate window
+	namedWindow("Image", WINDOW_AUTOSIZE);  // 无需手动销毁
+	imshow("Image", img);
+	waitKey(0);
+
+	// RGB -> HSV
+	namedWindow("hsv image", WINDOW_AUTOSIZE);
+	Mat hsv_img;
+	cvtColor(img, hsv_img, CV_RGB2HSV);
+	imshow("hsv image", hsv_img);
+
+	// save image
+	imwrite("./images/lenna_hsv.png", hsv_img);
+	waitKey(0);
+	return 0;
+}
