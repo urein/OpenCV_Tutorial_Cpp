@@ -17,7 +17,7 @@ int main()
 		waitKey(0);
 	}
 
-	Mat dst = Mat::zeros(src.size(), src.type());
+	Mat dst = Mat::zeros(src.size(), src.type());  // initialize mat object
 	cout << src.size();
 	cout << src.type();
 
