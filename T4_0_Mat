@@ -1,0 +1,54 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+
+using namespace std;
+using namespace cv;
+
+int main()
+{
+
+	// read image
+	Mat src = imread("./images/lenna.jpg");
+	namedWindow("source image", WINDOW_AUTOSIZE);
+	imshow("source image", src);
+	waitKey(0);
+
+	//Mat dst;
+	//dst = Mat(src.size(), src.type());  // one of the Mat constructor
+	//dst = Scalar(255, 0, 0);
+
+	/*
+	对于Mat 赋值和拷贝构造函数只会构造复制头部分
+	而clone和copyTo两个函数用于实现完全复制 见深拷贝与浅拷贝
+	*/
+
+	//Mat dst = src.clone();  // clone head+data
+
+	//Mat dst;
+	//src.copyTo(dst);  // copy head+data
+
+	//Mat dst;
+	//cvtColor(src, dst, CV_BGR2GRAY);
+	//cout << src.channels() << endl;
+	//cout << dst.channels() << endl;
+	//const uchar* first_row = src.ptr<uchar>(0);  // get ptr of 1st row
+	//cout << "first pixel: " << *first_row << endl;
+
+	//Mat dst(100, 100, CV_8UC3, Scalar(0, 0, 255));  // create a small image with 3x3
+	//cout << dst << endl;
+	//namedWindow("dst", WINDOW_AUTOSIZE);
+
+	//Mat dst;
+	//dst.create(src.size(), src.type());
+	//dst = Scalar(0, 0, 255);
+
+	//Mat dst = Mat::zeros(src.size(), src.type());
+	Mat dst = Mat::zeros(5, 5, CV_8UC1);
+	cout << dst << endl;
+	imshow("dst", dst);
+
+	
+	waitKey(0);
+
+	return 0;
+}
