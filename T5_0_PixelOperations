@@ -1,0 +1,64 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+int main()
+{
+	Mat src = imread("./images/vague.jpg");
+	
+	if (src.empty()) {
+		cout << "could not load image ..." << endl;
+		return -1;
+	}
+	imshow("source image", src);
+
+	// 灰度图取反
+	Mat grayImg;
+	cvtColor(src, grayImg, COLOR_BGR2GRAY);
+	for (int row = 0; row != src.rows; ++row)
+	{
+		for (int col = 0; col != src.cols; ++col)
+		{
+			int grayPixel = grayImg.at<uchar>(row, col);  // 获取像素值
+			grayImg.at<uchar>(row, col) = 255 - grayPixel;
+		}
+	}
+	imshow("255-grayImage", grayImg);
+
+
+	// 三通道图像
+	Mat dst = src.clone();
+
+	for (int row = 0; row != src.rows; ++row)
+	{
+		for (int col = 0; col != src.cols; ++col)
+		{
+			// 使用dst.at<Vec3b>返回三个道的像素值
+			// dst.at<Vec3b>(row, col)返回类型是 cv::Vec<unsigned char, 3>
+			auto b = dst.at<Vec3b>(row, col)[0];
+			auto g = dst.at<Vec3b>(row, col)[1];
+			auto r = dst.at<Vec3b>(row, col)[2];
+			
+			dst.at<Vec3b>(row, col)[0] = 255 - b;
+			dst.at<Vec3b>(row, col)[1] = 255 - g;
+			dst.at<Vec3b>(row, col)[2] = 255 - r;
+		}
+	}
+	imshow("255-src", dst);
+	
+	// bitwise_not
+	Mat dst2;
+	bitwise_not(src, dst2);
+	imshow("biswise_not of src", dst2);
+
+	// Vec3b与Vec3F的转换
+	Mat floatImage;
+	src.convertTo(floatImage, CV_32F);
+
+
+	waitKey(0);
+	
+	return 0;
+}
