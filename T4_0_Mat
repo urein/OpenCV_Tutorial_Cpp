@@ -62,10 +62,8 @@ int main()
 	// 获取行指针
 	const uchar* pFirstRow = dst.ptr<uchar>(0);
 	cout << *pFirstRow << endl;
-	
-	
-	imshow("dst", dst);
 
+	imshow("dst", dst);
 
 	waitKey(0);
 	
