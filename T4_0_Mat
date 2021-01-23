@@ -1,54 +1,73 @@
 #include<opencv2/opencv.hpp>
 #include<iostream>
-
 using namespace std;
 using namespace cv;
 
+
 int main()
 {
-
-	// read image
-	Mat src = imread("./images/lenna.jpg");
-	namedWindow("source image", WINDOW_AUTOSIZE);
+	Mat src = imread("./images/vague.jpg");
+	
+	if (src.empty()) {
+		cout << "could not load image ..." << endl;
+		return -1;
+	}
 	imshow("source image", src);
-	waitKey(0);
 
-	//Mat dst;
-	//dst = Mat(src.size(), src.type());  // one of the Mat constructor
-	//dst = Scalar(255, 0, 0);
 
-	/*
-	对于Mat 赋值和拷贝构造函数只会构造复制头部分
-	而clone和copyTo两个函数用于实现完全复制 见深拷贝与浅拷贝
-	*/
+	// ======== Mat的构造 ========
 
-	//Mat dst = src.clone();  // clone head+data
+	Mat m(6, 3, CV_8UC3, Scalar(0, 0, 255));  // 8位无符号char，三通道
+	// 拷贝构造，只会复制m的头和指针，不会复制数据。完全赋值则需要使用clone()和copyTo()
+	Mat m1(m);  
+	cout << m << endl;
 
-	//Mat dst;
-	//src.copyTo(dst);  // copy head+data
+	// 创建高维数组
+	int sz[3] = { 2, 2, 2 };
+	Mat m2(3, sz, CV_8UC1, Scalar::all(0));
+	cout << "L.size: " << m2.size << endl;  // 2*2*2
 
-	//Mat dst;
-	//cvtColor(src, dst, CV_BGR2GRAY);
-	//cout << src.channels() << endl;
-	//cout << dst.channels() << endl;
-	//const uchar* first_row = src.ptr<uchar>(0);  // get ptr of 1st row
-	//cout << "first pixel: " << *first_row << endl;
+	Mat m3;
+	m3.create(4, 3, CV_8UC2);  // 可以通过create创建Mat
+	m3 = Scalar(127, 127);
 
-	//Mat dst(100, 100, CV_8UC3, Scalar(0, 0, 255));  // create a small image with 3x3
-	//cout << dst << endl;
-	//namedWindow("dst", WINDOW_AUTOSIZE);
+	Mat dst(src.size(), src.type());
+	dst = Scalar(127, 0, 255);  // 每个像素的RGB都是127，0，255
 
-	//Mat dst;
-	//dst.create(src.size(), src.type());
-	//dst = Scalar(0, 0, 255);
+	// 定义kernel
+	Mat kernel = (Mat_<char>(3, 3) << 0, -1, 0, -1, 5, -5, 0, -1, 0);
+	cout << kernel << endl;
 
-	//Mat dst = Mat::zeros(src.size(), src.type());
-	Mat dst = Mat::zeros(5, 5, CV_8UC1);
-	cout << dst << endl;
+	Mat mZero = Mat::zeros(3, 3, CV_8UC2);  // 2各通道，所以有6列0
+	cout << mZero << endl;
+	Mat mEye = Mat::eye(3, 3, CV_8UC1);  // 单位矩阵
+	cout << mEye << endl;
+	
+	
+	// 完全拷贝
+	dst = src.clone();
+	src.copyTo(dst);
+	
+	cvtColor(src, dst, COLOR_BGR2GRAY);
+	src.channels();
+
+	// 行数、列数、通道数
+	int nRows = dst.rows;
+	auto nCols = dst.cols;
+	auto nChannels = dst.channels();
+	cout << "Row: " << nRows << endl;
+	cout << "Cols: " << nCols << endl;
+	cout << "Channels: " << nChannels << endl;
+
+	// 获取行指针
+	const uchar* pFirstRow = dst.ptr<uchar>(0);
+	cout << *pFirstRow << endl;
+	
+	
 	imshow("dst", dst);
 
-	
-	waitKey(0);
 
+	waitKey(0);
+	
 	return 0;
 }
