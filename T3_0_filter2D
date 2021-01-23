@@ -3,32 +3,29 @@
 using namespace std;
 using namespace cv;
 
+
 int main()
 {
-
-	// read image
-	Mat src = imread("./images/lenna.jpg");
+	Mat src = imread("./images/vague.jpg");
+	
 	if (src.empty()) {
 		cout << "could not load image ..." << endl;
+		return -1;
 	}
-	else {
-		namedWindow("source image", WINDOW_AUTOSIZE);
-		imshow("source image", src);
-		waitKey(0);
-	}
+	imshow("source image", src);
 
-	Mat dst = Mat::zeros(src.size(), src.type());
-	Mat kernel = (Mat_<char>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);  // define filter mask
-
-	double t = getTickCount();  // timing
-	//filter2D(src, dst, src.depth(), kernel);
-	filter2D(src, dst, -1, kernel);
-	cout << "Time Consuming: " << (getTickCount() - t) / getTickFrequency();
-
-	namedWindow("sharpened image", WINDOW_AUTOSIZE);
-	imshow("sharpened image", dst);
 	
-	waitKey(0);
+	// filter2D
+	Mat filteredImg;
+	Mat kernel = (Mat_<char>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
+	
+	double tStart = getTickCount();
+	filter2D(src, filteredImg, src.depth(), kernel);
+	cout << "Time consume: " << (getTickCount() - tStart) / getTickFrequency() << endl;
+	
+	imshow("filtered image", filteredImg);
 
+	waitKey(0);
+	
 	return 0;
 }
