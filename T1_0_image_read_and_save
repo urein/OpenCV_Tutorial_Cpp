@@ -3,30 +3,35 @@
 using namespace std;
 using namespace cv;
 
+
 int main()
 {
 
 	// read image
-	Mat img = imread("./images/lenna.png");
+	Mat src = imread("./images/lenna.png");
 	//Mat img = imread("./images/lenna.png", IMREAD_GRAYSCALE);  // read gray image
-	if (img.empty()) {
+	
+	if (src.empty()) {
 		cout << "could not load image ..." << endl;
 		return -1;
 	}
-
-	// generate window
-	namedWindow("Image", WINDOW_AUTOSIZE);  // 无需手动销毁
-	imshow("Image", img);
-	waitKey(0);
+	//namedWindow("Source", WINDOW_AUTOSIZE);  // 创建窗口，无须手动销毁
+	imshow("Source", src);
 
 	// RGB -> HSV
-	namedWindow("hsv image", WINDOW_AUTOSIZE);
 	Mat hsv_img;
-	cvtColor(img, hsv_img, CV_RGB2HSV);
+	cvtColor(src, hsv_img, COLOR_BGR2HSV);
 	imshow("hsv image", hsv_img);
+
+	Mat img_hls;
+	cvtColor(src, img_hls, COLOR_BGR2HLS);
+	imshow("HLS image", img_hls);
 
 	// save image
 	imwrite("./images/lenna_hsv.png", hsv_img);
+	
 	waitKey(0);
+	
+	
 	return 0;
 }
