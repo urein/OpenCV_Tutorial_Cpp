@@ -1,0 +1,33 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+int main()
+{
+	Mat src = imread("./images/boy.jpg");
+	imshow("source", src);
+
+	Mat medianImg;
+	medianBlur(src, medianImg, 9);
+	imshow("median filtered image", medianImg);
+
+	Mat gaussianImg;
+	GaussianBlur(src, gaussianImg, Size(9, 9), 3);
+	imshow("gaussian filtered image", gaussianImg);
+
+	Mat bilateralImg;
+	bilateralFilter(src, bilateralImg, 9, 200, 3);
+	imshow("bilateral filtered image", medianImg);
+
+	// sharpen the bilteral filtered image
+	Mat dst;
+	Mat kernel = (Mat_<int>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
+	filter2D(bilateralImg, dst, -1, kernel);
+	imshow("final result image", dst);
+
+	waitKey(0);
+	
+	return 0;
+}
