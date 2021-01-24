@@ -1,0 +1,59 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+Mat src = imread("./images/stars.png");
+Mat dst;
+int curSize = 0;
+int maxSize = 20;
+
+
+void myDilation(Mat& src, Mat& dst, int kernelSize)
+{
+	// 可视化的调节对象是形态学操作核的大小，而核的大小必须是奇数，因此必须写成这样的形式
+	// 如果直接用kernelSize当成调节对象，调节到偶数的时候程序会崩溃
+	int s = kernelSize * 2 + 1;  
+	Mat kernel = getStructuringElement(MORPH_RECT, Size(s, s));
+	
+	// 膨胀操作，取最大值
+	dilate(src, dst, kernel, Point(-1, -1), 1);
+	
+	imshow("dilation", dst);
+}
+
+void myErosion(Mat& src, Mat& dst, int kernelSize)
+{
+	int s = kernelSize * 2 + 1;
+	Mat kernel = getStructuringElement(MORPH_RECT, Size(s, s));
+	// 腐蚀操作，取最小值
+	erode(src, dst, kernel);
+	imshow("erosion", dst);
+}
+
+// trackbar的callBack函数的列表必须是这样的
+void callBackDilation(int, void*)
+{
+	myDilation(src, dst, curSize);
+}
+
+void callBackErosion(int, void*)
+{
+	myErosion(src, dst, curSize);
+}
+
+
+int main()
+{
+	namedWindow("outWindow", WINDOW_AUTOSIZE);
+
+	// curSize指向调节的参数，maxSize为调节参数的上限，回调函数callBack的参数列表必须是(int, void*)
+	//createTrackbar("Element Size", "outWindow", &curSize, maxSize, callBackDilation);
+
+	createTrackbar("Element Size", "outWindow", &curSize, maxSize, callBackErosion);
+
+	waitKey(0);
+	
+	return 0;
+}
