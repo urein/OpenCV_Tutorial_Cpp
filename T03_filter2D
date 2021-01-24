@@ -6,7 +6,7 @@ using namespace cv;
 
 int main()
 {
-	Mat src = imread("./images/b.jpg");
+	Mat src = imread("./images/boy.jpg");
 	resize(src, src, Size(), 0.5, 0.5);
 	imshow("source", src);
 
