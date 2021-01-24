@@ -35,34 +35,34 @@ void myCircle(Mat& src)
 	imshow("draw circle", src);
 }
 
-void myPolygon(Mat src)
+void myPolygon(Mat& src)
 {
 	// Points保存各个多边形的顶点，下面包含了两个多边形，每一个有4个顶点
 	Point points[2][4] = {
 		{Point(200, 200), Point(180, 250), Point(230, 250), Point(250, 200)},
 		{Point(120, 100), Point(100, 170), Point(150, 150), Point(150, 100)}
 	};
-	
+
 	// pPoints是一个指针数组。每个元素是指向 一个多边形所有顶点构成的数组(即首元素) 的指针
 	const Point* pPoints[] = { points[0], points[1] };
 
 	int ns[] = { 4, 4 };  // 每个多边形的顶点数
-	
+
 	fillPoly(src, pPoints, ns, 2, Scalar(0, 0, 255));  // 2表示绘制上述两个多边形，如果是1则只绘制第一个
-	
+
 	// polylines用于绘制多边形轮廓，参数和fillPoly大同小异，只是多了一个是否闭合的参数，1表示闭合
 	polylines(src, pPoints, ns, 2, 1, Scalar(255, 0, 0), 2);  // 2表示绘制上述两个多边形，如果是1则只绘制第一个
 
 	imshow("polygons", src);
 }
 
-void myText(Mat src, string text)
+void myText(Mat& src, string text)
 {
 	putText(src, text, Point(30, 30), FONT_HERSHEY_COMPLEX, 0.5, Scalar(255, 255, 255), 2);
 	imshow("put text", src);
 }
 
-void myRandomLine(Mat src)
+void myRandomLine(Mat& src)
 {
 	RNG rng(555666);  // opencv下的随机数生成器
 	Point pt1, pt2;
@@ -72,7 +72,7 @@ void myRandomLine(Mat src)
 	pt2.y = rng.uniform(0, src.rows);
 	Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));  // 生成随机颜色
 	line(src, pt1, pt2, color, 2);
-	
+
 	imshow("random line", src);
 }
 
@@ -88,8 +88,8 @@ int main()
 	myPolygon(src);
 	myText(src, "Hello OpenCV");
 	myRandomLine(src);
-	
+
 	waitKey(0);
-	
+
 	return 0;
 }
