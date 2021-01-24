@@ -1,0 +1,36 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+int main()
+{
+	Mat src = imread("./images/scene.jpg");
+	imshow("source image", src);
+	
+	Mat dst = Mat::zeros(src.size(), src.type());
+
+	float alpha = 1.8;
+	float beta = 30;
+	src.convertTo(src, CV_32F);  // 把src的数据类型转为float
+
+	for (int row = 0; row != src.rows; ++row)
+	{
+		for (int col = 0; col != src.cols; ++col)
+		{
+			auto b = src.at<Vec3f>(row, col)[0];
+			auto g = src.at<Vec3f>(row, col)[1];
+			auto r = src.at<Vec3f>(row, col)[2];
+			src.at<Vec3f>(row, col)[0] = saturate_cast<float>(b * alpha + beta);
+			src.at<Vec3f>(row, col)[1] = saturate_cast<float>(g * alpha + beta);
+			src.at<Vec3f>(row, col)[2] = saturate_cast<float>(r * alpha + beta);
+		}
+	}
+
+	src.convertTo(src, CV_8UC3);  // 图像必须是uchar类型的才能show，float类型的图像不能show
+	imshow("brighter source image", src);
+	waitKey(0);
+	
+	return 0;
+}
