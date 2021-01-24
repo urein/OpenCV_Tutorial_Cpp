@@ -1,0 +1,95 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+void myLine(Mat& src)
+{
+	Point pt1 = Point(20, 30);
+	Point pt2;
+	pt2.x = 20;
+	pt2.y = 300;
+	line(src, pt1, pt2, Scalar(0, 0, 255), 2, LINE_8);
+	imshow("draw line", src);
+}
+
+void myRectangle(Mat& src)
+{
+	Rect rect = Rect(100, 40, 200, 320);
+	Scalar color = Scalar(0, 255, 0);
+	rectangle(src, rect, color, 2, LINE_8);
+	imshow("draw rechtangle", src);
+}
+
+void myEllipse(Mat& src)
+{
+	// Size axis表示轴长，起始角度为45，绘制0到300度的一个不完整的椭圆
+	ellipse(src, Point(src.cols / 2, src.rows / 2), Size(src.rows / 4, src.cols / 4), 45, 0, 300, Scalar(255, 0, 255), 2);
+	imshow("draw ellipse", src);
+}
+
+void myCircle(Mat& src)
+{
+	Point center = Point(src.cols / 2, src.rows / 2);  // 圆心，先是x轴后是y轴
+	circle(src, center, 60, Scalar(255, 255, 0), 2);
+	imshow("draw circle", src);
+}
+
+void myPolygon(Mat src)
+{
+	// Points保存各个多边形的顶点，下面包含了两个多边形，每一个有4个顶点
+	Point points[2][4] = {
+		{Point(200, 200), Point(180, 250), Point(230, 250), Point(250, 200)},
+		{Point(120, 100), Point(100, 170), Point(150, 150), Point(150, 100)}
+	};
+	
+	// pPoints是一个指针数组。每个元素是指向 一个多边形所有顶点构成的数组(即首元素) 的指针
+	const Point* pPoints[] = { points[0], points[1] };
+
+	int ns[] = { 4, 4 };  // 每个多边形的顶点数
+	
+	fillPoly(src, pPoints, ns, 2, Scalar(0, 0, 255));  // 2表示绘制上述两个多边形，如果是1则只绘制第一个
+	
+	// polylines用于绘制多边形轮廓，参数和fillPoly大同小异，只是多了一个是否闭合的参数，1表示闭合
+	polylines(src, pPoints, ns, 2, 1, Scalar(255, 0, 0), 2);  // 2表示绘制上述两个多边形，如果是1则只绘制第一个
+
+	imshow("polygons", src);
+}
+
+void myText(Mat src, string text)
+{
+	putText(src, text, Point(30, 30), FONT_HERSHEY_COMPLEX, 0.5, Scalar(255, 255, 255), 2);
+	imshow("put text", src);
+}
+
+void myRandomLine(Mat src)
+{
+	RNG rng(555666);  // opencv下的随机数生成器
+	Point pt1, pt2;
+	pt1.x = rng.uniform(0, src.cols);
+	pt1.y = rng.uniform(0, src.rows);
+	pt2.x = rng.uniform(0, src.cols);
+	pt2.y = rng.uniform(0, src.rows);
+	Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));  // 生成随机颜色
+	line(src, pt1, pt2, color, 2);
+	
+	imshow("random line", src);
+}
+
+
+int main()
+{
+	//Mat src = imread("./images/scene.jpg", IMREAD_GRAYSCALE);
+	Mat src = imread("./images/scene.jpg");
+	myLine(src);
+	myRectangle(src);
+	myEllipse(src);
+	myCircle(src);
+	myPolygon(src);
+	myText(src, "Hello OpenCV");
+	myRandomLine(src);
+	
+	waitKey(0);
+	
+	return 0;
+}
