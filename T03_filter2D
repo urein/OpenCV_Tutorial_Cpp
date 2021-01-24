@@ -6,26 +6,28 @@ using namespace cv;
 
 int main()
 {
-	Mat src = imread("./images/vague.jpg");
-	
-	if (src.empty()) {
-		cout << "could not load image ..." << endl;
-		return -1;
-	}
-	imshow("source image", src);
+	Mat src = imread("./images/b.jpg");
+	resize(src, src, Size(), 0.5, 0.5);
+	imshow("source", src);
 
-	
-	// filter2D
-	Mat filteredImg;
-	Mat kernel = (Mat_<char>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
-	
-	double tStart = getTickCount();
-	filter2D(src, filteredImg, src.depth(), kernel);
-	cout << "Time consume: " << (getTickCount() - tStart) / getTickFrequency() << endl;
-	
-	imshow("filtered image", filteredImg);
+	Mat medianImg;
+	medianBlur(src, medianImg, 7);
+	imshow("median filtered image", medianImg);
+
+	Mat gaussianImg;
+	GaussianBlur(src, gaussianImg, Size(7, 7), 3);
+	imshow("gaussian filtered image", gaussianImg);
+
+	Mat bilateralImg;
+	bilateralFilter(src, bilateralImg, 7, 300, 300);
+	imshow("bilateral filtered image", bilateralImg);
+
+	Mat dst;
+	Mat kernel = (Mat_<int>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);  // sharpen the image
+	filter2D(medianImg, dst, -1, kernel);
+	imshow("final result image", dst);
 
 	waitKey(0);
-	
+
 	return 0;
 }
