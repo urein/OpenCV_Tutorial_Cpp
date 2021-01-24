@@ -1,0 +1,100 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+/*
+close: dilation + erosion
+当背景是黑色时，闭操作可以填补图像中间一些黑色的小区域
+dilation可以把黑色的小洞填上，erosion把剩余的部分回复之前的大小
+
+open: erosion + dilation
+当背景是黑色时，可以去掉小的区域。
+erosion去掉图像中小的区域(灰度值肯定比0大)，dilation把剩余的部分回复之前的大小
+
+tophat: src - open
+当背景是黑色时，得到被去除的那些小区域
+open是去除小区域后的图像
+
+blackhat：close - src 
+当背景是黑色时，得到用于填充小洞的那些“填充物”，比如可以用于检测缺陷，坏洞
+close是填充后的图像
+
+morpological gradient: dilation - erosion
+通过形态学计算出来的梯度
+*/
+
+
+void testOpening()
+{
+	Mat src = imread("./images/test_open.png");
+	resize(src, src, Size(), 3, 3);
+	imshow("resized source image", src);
+
+	Mat openImg;
+	Mat kernel = getStructuringElement(MORPH_RECT, Size(9, 9));
+	morphologyEx(src, openImg, MORPH_OPEN, kernel, Point(-1, -1), 1);
+	imshow("opening operation", openImg);
+}
+
+void testClosing()
+{
+	Mat src = imread("./images/test_close.png");
+	resize(src, src, Size(), 2, 2);
+	imshow("resized source image", src);
+	
+	Mat closeImg;
+	Mat kernel = getStructuringElement(MORPH_RECT, Size(7, 7));
+	morphologyEx(src, closeImg, MORPH_CLOSE, kernel);
+	imshow("Closing operation", closeImg);
+}
+
+
+void testTopHat()
+{
+	Mat src = imread("./images/test_open.png");
+	resize(src, src, Size(), 3, 3);
+	imshow("resized source image", src);
+
+	Mat openImg;
+	Mat kernel = getStructuringElement(MORPH_RECT, Size(9, 9));
+	morphologyEx(src, openImg, MORPH_TOPHAT, kernel, Point(-1, -1), 1);
+	imshow("tophat operation", openImg);
+}
+
+void testBlackHat()
+{
+	Mat src = imread("./images/test_close.png");
+	resize(src, src, Size(), 2, 2);
+	imshow("blackhat operation", src);
+
+	Mat closeImg;
+	Mat kernel = getStructuringElement(MORPH_RECT, Size(7, 7));
+	morphologyEx(src, closeImg, MORPH_BLACKHAT, kernel);
+	imshow("Closing operation", closeImg);
+}
+
+void testMorphologicalGradient()
+{
+	Mat src = imread("./images/scene.jpg");
+	imshow("source image", src);
+
+	Mat morphoGrad;
+	Mat kernel = getStructuringElement(MORPH_RECT, Size(3, 3));
+	morphologyEx(src, morphoGrad, MORPH_GRADIENT, kernel);
+	imshow("morphological gradient", morphoGrad);
+}
+
+int main()
+{
+	//testOpening();
+	//testClosing();
+	//testTopHat();
+	testBlackHat();
+	//testMorphologicalGradient();
+
+	waitKey(0);
+
+	return 0;
+}
