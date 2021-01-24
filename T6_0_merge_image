@@ -1,0 +1,33 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+int main()
+{
+	Mat stars = imread("./images/stars.png");
+	Mat scene = imread("./images/scene.jpg");
+	Mat dst;
+
+	resize(stars, stars, scene.size());  // 将stars的形状变成和scene一样的大小
+	
+	addWeighted(scene, 0.8, stars, 0.2, 0.0, dst);
+	imshow("merged image1", dst);
+
+	Mat dst2;
+	add(scene, stars, dst2);
+	imshow("merged image2", dst2);
+
+	Mat dst3;
+	subtract(scene, stars, dst3);
+	imshow("subtracted image2", dst3);
+
+	Mat dst4;
+	multiply(scene, stars, dst4, 1.0);
+	imshow("multiplied result", dst4);
+
+	waitKey(0);
+	
+	return 0;
+}
