@@ -1,0 +1,56 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+int main()
+{
+	Mat src = imread("./images/lines.png");
+	if (src.empty())
+	{
+		cout << "could not open image." << endl;
+		return -1;
+	}
+	resize(src, src, Size(), 0.5, 0.5);
+	imshow("source image", src);
+
+	Mat srcGray;
+	cvtColor(src, srcGray, COLOR_BGR2GRAY);
+	imshow("gray image", srcGray);
+	
+	Mat binaryImg;
+	// ~ 将图像取反，让背景是黑色
+	adaptiveThreshold(~srcGray, binaryImg, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 15, 0);
+	imshow("binary image", binaryImg);
+
+	// open是先腐蚀，横向的kernel可以把竖线全都腐蚀掉，得到横线。反之
+	Mat hKernel = getStructuringElement(MORPH_RECT, Size(1, 10));
+	Mat vImg;
+	morphologyEx(binaryImg, vImg, MORPH_OPEN, hKernel, Point(-1, -1), 1);
+	bitwise_not(vImg, vImg);
+	imshow("vertical lines", vImg);
+
+	Mat hImg;
+	Mat vKernel = getStructuringElement(MORPH_RECT, Size(10, 1));
+	morphologyEx(binaryImg, hImg, MORPH_OPEN, vKernel, Point(-1, -1), 1);
+	bitwise_not(hImg, hImg);
+	imshow("horizontal lines", hImg);
+
+
+
+	Mat src2 = imread("./images/abcd.png");
+	imshow("source image ABCD", src2);
+	Mat src2Gray;
+	cvtColor(src2, src2Gray, COLOR_BGR2GRAY);
+	Mat binaryImg2;
+	adaptiveThreshold(~src2Gray, binaryImg2, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 15, 0);
+	Mat dst;
+	Mat kernel = getStructuringElement(MORPH_RECT, Size(3, 3));
+	morphologyEx(binaryImg2, dst, MORPH_OPEN, kernel, Point(-1, -1), 1);
+	imshow("dst ABCD", dst);
+
+	waitKey(0);
+
+	return 0;
+}
