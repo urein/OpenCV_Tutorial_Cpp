@@ -1,0 +1,52 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+Mat src = imread("./images/cat.jpg");
+int thresh = 0;  // adjust threshold in bar
+int threshMax = 255;
+int typeVal = 0;  // adjust binarization mode in bar
+int typeMax = 6;
+
+
+void binarize(Mat src)
+{
+	Mat binImg;
+	cvtColor(src, binImg, COLOR_BGR2GRAY);
+	imshow("binary image", binImg);
+	if (typeVal == 0)
+		threshold(binImg, binImg, thresh, threshMax, THRESH_BINARY);  // 大于阈值的取max，小于阈值的取0
+	else if (typeVal == 1)
+		threshold(binImg, binImg, thresh, threshMax, THRESH_BINARY_INV);
+	else if (typeVal == 2)
+		threshold(binImg, binImg, thresh, threshMax, THRESH_TOZERO);  // 大于阈值的取原值，小于阈值的取0
+	else if (typeVal == 3)
+		threshold(binImg, binImg, thresh, threshMax, THRESH_TOZERO_INV);
+	else if (typeVal == 4)
+		threshold(binImg, binImg, thresh, threshMax, THRESH_TRUNC);  // 大于阈值的取阈值，小于阈值的取原值
+	else if (typeVal == 5)
+		threshold(binImg, binImg, 0, 255, THRESH_OTSU);  // 自动计算
+	else 
+		threshold(binImg, binImg, 0, 255, THRESH_TRIANGLE);  // 自动计算
+
+	imshow("image thresholding", binImg);
+}
+
+void callBack(int, void*)
+{
+	binarize(src);
+}
+
+
+int main()
+{
+	namedWindow("outWindow", WINDOW_AUTOSIZE);
+	createTrackbar("Threshold", "outWindow", &thresh, threshMax, callBack);
+	createTrackbar("BinaryType", "outWindow", &typeVal, typeMax, callBack);
+
+	waitKey(0);
+
+	return 0;
+}
