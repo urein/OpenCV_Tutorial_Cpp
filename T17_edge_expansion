@@ -1,0 +1,66 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+/*
+图像边缘的处理模式：
+BORDER_DEFAULT：默认值，用镜像填充
+BORDER_CONSTANT：用指定像素填充
+BORDER_REPLICATE：用已有的边缘像素填充
+BORDER_WRAP：用另外一边的像素来填充
+
+根据上述的处理模式为图像添加边缘：copyMakeBorder()
+*/
+
+
+int main()
+{
+	Mat src = imread("./images/scene.jpg");
+	if (!src.empty())
+	{
+		imshow("Source", src);
+	}
+	else
+		cout << "could not open image." << endl;
+	
+	// 待填充的边缘的大小
+	int top = 0.05 * src.rows;
+	int bottom = 0.05 * src.rows;
+	int left = 0.05 * src.cols;
+	int right = 0.05 * src.cols;
+	
+	RNG rng(0);
+	int borderType = BORDER_DEFAULT;
+
+	unsigned char c = 0;
+	while (true)
+	{
+		// 不按则使用默认设置，按r，w或c得到不同的边缘
+		c = waitKey(5000);
+		if (c == 27)
+			break;
+		else if (c == 'r')
+			borderType = BORDER_REPLICATE;
+		else if (c == 'w')
+			borderType = BORDER_WRAP;
+		else if (c == 'c')
+			borderType = BORDER_CONSTANT;
+		else
+			borderType = BORDER_DEFAULT;
+
+		Scalar color = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+		Mat dst;
+		copyMakeBorder(src, dst, top, bottom, left, right, borderType, color);
+		imshow("Dst", dst);
+	}
+
+	Mat gaussianImg;
+	GaussianBlur(src, gaussianImg, Size(5, 5), 0, 0, BORDER_CONSTANT);  // 可以在这里指定边缘处理方式
+	imshow("Gaussian filtered Image", gaussianImg);
+
+	waitKey(0);
+
+	return 0;
+}
