@@ -15,7 +15,7 @@ String outTitle = "Canny Result";
 void callback(int, void*)
 {
 	blur(grayImg, edgeImg, Size(3, 3));
-	Canny(edgeImg, edgeImg, tLow, tLow * 2);
+	Canny(edgeImg, edgeImg, tLow, tLow * 2);  // Canny的输入必须是灰度图
 	
 	// 直接展示Canny后的结果edgeImg（二值图）
 	imshow("Canny Result", edgeImg);
