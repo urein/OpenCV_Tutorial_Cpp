@@ -1,0 +1,45 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+Mat src, grayImg;
+Mat dstImg, edgeImg;
+
+int tLow = 0;
+int tMax = 100;
+String outTitle = "Canny Result";
+
+
+void callback(int, void*)
+{
+	blur(grayImg, edgeImg, Size(3, 3));
+	Canny(edgeImg, edgeImg, tLow, tLow * 2);
+	
+	// 直接展示Canny后的结果edgeImg（二值图）
+	imshow("Canny Result", edgeImg);
+
+	// 展示Canny提取的边缘像素对应到原图上的结果。即masked src拷贝给dstImg，展示dstImg，mask就是二值的edgeImg
+	//dstImg = Scalar::all(0);
+	//src.copyTo(dstImg, edgeImg);  // 带有mask的copyTo，如果mask上对应位置的值为0则不拷贝，如果mask值为1则拷贝 
+	//imshow("Canny Result", dstImg);
+}
+
+
+int main()
+{
+	src = imread("./images/cat.jpg");
+	dstImg.create(src.size(), src.type());
+	cvtColor(src, grayImg, COLOR_BGR2GRAY);
+	namedWindow(outTitle, WINDOW_AUTOSIZE);
+
+	// 做好准备工作后，进入trackbar的callback函数
+	createTrackbar("Threshold", "Canny Result", &tLow, tMax, callback);
+	callback(0, 0);
+
+	waitKey(0);
+
+	return 0;
+}
+
