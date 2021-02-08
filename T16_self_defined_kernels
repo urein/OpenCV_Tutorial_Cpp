@@ -1,0 +1,68 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+int main()
+{
+	Mat src = imread("./images/boy.jpg");
+	if (!src.empty())
+	{
+		resize(src, src, Size(), 0.5, 0.5);
+		imshow("Source", src);
+	}
+	else
+		cout << "could not open image." << endl;
+	
+	// Robert Kernel
+	Mat k_robertX = (Mat_<int>(2, 2) << 1, 0, 0, -1);  // "\" 方向上的差异
+	Mat robertXImg;
+	filter2D(src, robertXImg, -1, k_robertX);
+	imshow("Filtered result by Robert x", robertXImg);
+
+	Mat k_robertY = (Mat_<int>(2, 2) << 0, 1, -1, 0);  // "/" 方向上的差异
+	Mat robertYImg;
+	filter2D(src, robertYImg, -1, k_robertY);
+	imshow("Filtered result by Robert y", robertYImg);
+
+	// Sobel Kernel
+	Mat kernelSobelX = (Mat_<int>(3, 3) << -1, 0, 1, -2, 0, 2, -1, 0, 1);
+	Mat sobelXImg;
+	filter2D(src, sobelXImg, -1, kernelSobelX);
+	imshow("Filtered result by Sobel x", sobelXImg);
+
+	Mat kernelSobelY = (Mat_<int>(3, 3) << -1, -2, -1, 0, 0, 0, 1, 2, 1);
+	Mat sobelYImg;
+	filter2D(src, sobelYImg, -1, kernelSobelY);
+	imshow("Filtered result by Sobel y", sobelYImg);
+
+	// Laplace Kernel
+	Mat kernelLaplace = (Mat_<int>(3, 3) << 0, -1, 0, -1, 4, -1, 0, -1, 0);
+	Mat laplaceImg;
+	filter2D(src, laplaceImg, -1, kernelLaplace);
+	imshow("Filtered result by Laplace", laplaceImg);
+
+	// Self-Defined Kernel for Blurring
+	int c = 0;
+	int idx = 0;
+	int ksize;
+	while (true)
+	{
+		c = waitKey(500);
+		if (c == 27)  // 按Esc退出
+			break;
+		
+		ksize = 4 + (idx % 15) * 2 + 1;
+		Mat myKernel = Mat::ones(Size(ksize, ksize), CV_32F) / (float)(ksize * ksize);
+		Mat filteredImg;
+		filter2D(src, filteredImg, -1, myKernel);
+		imshow("Customized Blurring", filteredImg);
+		++idx;
+	}
+
+
+	waitKey(0);
+
+	return 0;
+}
