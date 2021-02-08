@@ -38,7 +38,7 @@ int main()
 	imshow("horizontal lines", hImg);
 
 
-    // 在提取ABCD
+        // 例子：提取ABCD
 	Mat src2 = imread("./images/abcd.png");
 	imshow("source image ABCD", src2);
 	Mat src2Gray;
