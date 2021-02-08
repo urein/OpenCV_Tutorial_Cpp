@@ -1,0 +1,59 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+int main()
+{
+	Mat src = imread("./images/cat.jpg");
+	if (!src.empty())
+	{
+		imshow("Source", src);
+	}
+	else
+		cout << "could not open image." << endl;
+	
+	Mat gaussianImg;
+	GaussianBlur(src, gaussianImg, Size(3, 3), 0, 0);
+	Mat grayImg;
+	cvtColor(gaussianImg, grayImg, COLOR_BGR2GRAY);
+	imshow("blurred gray image", grayImg);
+
+	Mat xImg, yImg;
+	
+	// 下面的ddepth可以是-1，表示和原图的ddepth一样
+	// 我们也可以对它进行提升，比如将输入的CV_8U提升为CV_16S，得到的结果会更清楚
+	
+	Sobel(grayImg, xImg, CV_16S, 1, 0, 3);  // dx=1表示对x方向求1阶导数
+	//Scharr(grayImg, xImg, CV_16S, 1, 0, 3);
+	convertScaleAbs(xImg, xImg);  // 把负值全部变成正的
+
+	Sobel(grayImg, yImg, CV_16S, 0, 1, 3);  // dy=1表示对y方向求1阶导数
+	//Scharr(grayImg, yImg, CV_16S, 0, 1, 3);
+	convertScaleAbs(yImg, yImg);  // 把负值全部变成正的
+
+	imshow("Sobel x", xImg);
+	imshow("Sobel y", yImg);
+
+	Mat xyImgA;
+	addWeighted(xImg, 0.5, yImg, 0.5, 0, xyImgA);
+	imshow("Sobel xy", xyImgA);
+
+	// 手动实现相加
+	Mat xyImgM(xImg.size(), xImg.type());
+	for (int row = 0; row != xImg.rows; ++row)
+	{
+		for (int col = 0; col != xImg.cols; ++col)
+		{
+			int xg = xImg.at<uchar>(row, col) * 0.5;
+			int yg = yImg.at<uchar>(row, col) * 0.5;
+			xyImgM.at<uchar>(row, col) = saturate_cast<uchar>(xg + yg);
+		}
+	}
+	imshow("Sobel xy manually", xyImgM);
+
+	waitKey(0);
+
+	return 0;
+}
