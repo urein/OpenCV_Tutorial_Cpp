@@ -18,10 +18,10 @@ int main()
 	Mat srcGray;
 	cvtColor(src, srcGray, COLOR_BGR2GRAY);
 	imshow("gray image", srcGray);
-	
+
 	Mat binaryImg;
-	// ~ 将图像取反，让背景是黑色
-	adaptiveThreshold(~srcGray, binaryImg, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 15, 0);
+	// 转换为二值图像
+	adaptiveThreshold(~srcGray, binaryImg, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 15, 0);  // ~ 将图像取反，让背景是黑色
 	imshow("binary image", binaryImg);
 
 	// open是先腐蚀，横向的kernel可以把竖线全都腐蚀掉，得到横线。反之
@@ -38,7 +38,7 @@ int main()
 	imshow("horizontal lines", hImg);
 
 
-
+    // 在提取ABCD
 	Mat src2 = imread("./images/abcd.png");
 	imshow("source image ABCD", src2);
 	Mat src2Gray;
