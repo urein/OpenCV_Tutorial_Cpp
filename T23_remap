@@ -13,8 +13,8 @@ remap就是把图像中的像素从一个位置变换到另一个位置。即dst
 OpenCV: cv::remap
 src：原图
 dst：map后的目标图像，和src大小相同
-map_x：x方向上的映射关系，大小和src一样。即dst的(i_row, i_col)像素是src中的哪个像素得来的。
-map_y：y方向上的映射关系，大小和src一样。即dst的(i_row, i_col)像素是src中的哪个像素得来的。
+map_x：x方向上的映射关系，大小和src一样。即dst的(i_row, i_col)像素是src中的哪个像素得来的（src上对应像素的横坐标）。
+map_y：y方向上的映射关系，大小和src一样。即dst的(i_row, i_col)像素是src中的哪个像素得来的（src上对应像素的纵坐标）。
 interpolation：对map之后非integer的像素进行插值，默认值是INTER_LINEAR
 bordermode：默认值是BORDER_CONSTANT
 */
@@ -45,13 +45,13 @@ int main()
 		
 		// 根据填充好映射关系的映射矩阵进行mapping，得到dst。
 		// dst中没有在src中找到映射关系的像素填充为指定颜色
-		remap(src, dst, map_x, map_y, INTER_LINEAR, BORDER_CONSTANT, Scalar(0, 0, 0));
+		remap(src, dst, map_x, map_y, INTER_LINEAR, BORDER_CONSTANT, Scalar(0, 255, 0));
 		
 		imshow("Remap demo", dst);
 		
-		char c = waitKey(2000);
+		char c = waitKey(0);
 		if (c == 27)
-			break;
+			continue;
 	}
 	return 0;
 }
@@ -84,18 +84,18 @@ void update_map(int& idx, Mat& map_x, Mat& map_y)
 				break;
 			case 1:
 				// 将src沿竖直方向翻转
-				map_x.at<float>(row, col) = col;  // dst中(row, col)位置的x轴上的像素就是原图col位置的像素
-				map_y.at<float>(row, col) = map_x.rows - row;  // dst中(row, col)位置的y轴上的像素，就是图像高度减去原图的row，实现y轴上的翻转
+				map_x.at<float>(row, col) = col;  // dst中(row, col)位置的像素所对应的src上那个像素的横坐标为col
+				map_y.at<float>(row, col) = map_x.rows - row - 1;  // dst中(row, col)位置的像素所对应的src上那个像素的纵坐标为map_x.rows-row-1，以实现y轴翻转
 				break;
 			case 2:
 				// 将src沿水平方向翻转
-				map_x.at<float>(row, col) = map_x.cols - col;  // x轴翻转
+				map_x.at<float>(row, col) = map_x.cols - col - 1;  // x轴翻转
 				map_y.at<float>(row, col) = row;  // y轴不动
 				break;
 			case 3:
 				// 将src沿水平方向和竖直方向翻转
-				map_x.at<float>(row, col) = map_x.cols - col;  // x轴翻转
-				map_y.at<float>(row, col) = map_x.rows - row;  // y轴翻转
+				map_x.at<float>(row, col) = map_x.cols - col - 1;  // x轴翻转
+				map_y.at<float>(row, col) = map_x.rows - row - 1;  // y轴翻转
 				break;
 			default:
 				break;
