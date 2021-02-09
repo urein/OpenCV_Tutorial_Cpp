@@ -1,0 +1,52 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+/*
+霍夫圆检测：
+image空间的一个点对应Hough空间的一个圆
+image空间来自同一个圆的点在Hough空间中交于一点
+
+霍夫圆检测对噪声非常敏感，因此要对图像做中值滤波
+*/
+
+
+int main()
+{
+	Mat src = imread("./images/circles2.jpg");
+	resize(src, src, Size(0, 0), 0.5, 0.5);
+
+	Mat grayImg;
+	cvtColor(src, grayImg, COLOR_BGR2GRAY);
+	
+	// 中值滤波
+	medianBlur(grayImg, grayImg, 3);
+
+	// Hough圆检测
+	// method: HOUGH_GRADIENT
+	// dp：一般取1
+	// mindist：对于同心圆，如果距离小于这个最短距离就认为是同一个圆
+	// param1：canny的低阈值
+	// param2：中心点累加器阈值，决定候选圆心，主要的调节参数
+	// minradius/maxradius：最大最小半径
+	vector<Vec3f> pcircles;
+	HoughCircles(grayImg, pcircles, HOUGH_GRADIENT, 1, 10, 100, 70, 0, 0);
+	Mat circleImg;
+	src.copyTo(circleImg);
+
+	// 画圆
+	for (size_t i = 0; i != pcircles.size(); ++i)
+	{
+		Vec3f centerR = pcircles[i];
+		circle(circleImg, Point(centerR[0], centerR[1]), centerR[2], Scalar(255, 0, 0));
+		circle(circleImg, Point(centerR[0], centerR[1]), 2, Scalar(255, 0, 0), 2);
+	}
+	imshow("Detected Circles", circleImg);
+
+	waitKey(0);
+
+	return 0;
+}
+
