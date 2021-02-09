@@ -1,0 +1,86 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+/*
+直方图H(i)：图像像素值的分布
+当图像的像素值分布都聚集在一起时，说明图像整体看上去都一样，即对比度很低。
+
+直方图均衡化：把直方图拉长，让像素值的分布更为均匀，以此来提升图像的对比度。
+
+方式：通过累计分布函数cdf进行映射(accumulative distribution function)
+H'(i) = Σ H(j) for all 0<=j<i
+对于原图像的每一个像素src(x, y)，处理后的像素为 equalized(x, y) = H'(src(x, y))
+*/
+
+/*
+calcHist参数：
+	
+	const Mat* images：输入图像，这里只有单通道的一张图。如果是多张可以以序列的形式输入
+	int images：输入图像数目
+	const int* channels：待测量的每张图的通道数，从0开始计数
+	InputArray mask：作用在图像上的mask，值为0的对应位置的像素不会被考虑进来。输入Mat()表示不适用mask
+	OutputArray hist：Mat类型的直方图
+	int dims：直方图的维数，这里为1
+	const int* histSize： 直方图每个维度下bin的个数
+	const float* ranges：直方图每个维度下测量数据的范围
+	bool uniform：bin的个数都是一样的，默认为True 
+	bool accumulate：直方图在一开始是空的，默认为False
+*/
+
+
+int main()
+{
+	Mat src = imread("./images/scene.jpg");
+	if (src.empty())
+	{
+		cout << "cannot open the image!" << endl;
+		return -1;
+	}
+	
+	// 把彩色图拆分成BGR三个单通道图像
+	vector<Mat> bgr_planes;
+	split(src, bgr_planes);
+
+	// 分别构建三个通道的直方图
+	int histSize = 256;  // 统计0-255的直方图
+	float range[] = { 0, 256 };
+	// note: histRange保存的是首元素range的地址，range保存的是首元素0的地址。故histRange是一个二级指针float**
+	const float* histRange = range;  // calcHist中的histRange参数要求必须以这种形式传入
+	//const float* histRange = range;
+
+	bool uniform = true, accumulate = false;
+	
+	Mat bHist, gHist, rHist;
+	calcHist(&bgr_planes[0], 1, 0, Mat(), bHist, 1, &histSize, &histRange, uniform, accumulate);  // bHist: (256, 1)
+	calcHist(&bgr_planes[1], 1, 0, Mat(), gHist, 1, &histSize, &histRange, uniform, accumulate);
+	calcHist(&bgr_planes[2], 1, 0, Mat(), rHist, 1, &histSize, &histRange, uniform, accumulate);
+
+	int histW = 512, histH = 400;  // 整个直方图的宽度
+	int binW = cvRound((double)histW / histSize);  // bin的宽度
+
+	Mat histImg(histH, histW, CV_8UC3, Scalar(0, 0, 0));  // 保存最终的直方图
+	// 把得到的每个通道的直方图的256个值（可能很大），映射到0-400之间
+	normalize(bHist, bHist, 0, histImg.rows, NORM_MINMAX, -1, Mat());  
+	normalize(gHist, gHist, 0, histImg.rows, NORM_MINMAX, -1, Mat());
+	normalize(rHist, rHist, 0, histImg.rows, NORM_MINMAX, -1, Mat());
+
+	// 在histImg上绘制直方图。
+	// 因为图像的原点在左上角，因此为了观察方便，y轴需要用图的高度400减去实际的值（相当于把图倒过来）
+	for (int i = 1; i != histSize; ++i)
+	{
+		line(histImg, Point(binW * (i - 1), histH - cvRound(bHist.at<float>(i - 1))),
+			Point(binW * i, histH - cvRound(bHist.at<float>(i))), Scalar(255, 0, 0));
+		line(histImg, Point(binW * (i - 1), histH - cvRound(gHist.at<float>(i - 1))),
+			Point(binW * i, histH - cvRound(gHist.at<float>(i))), Scalar(0, 255, 0));
+		line(histImg, Point(binW * (i - 1), histH - cvRound(rHist.at<float>(i - 1))),
+			Point(binW * i, histH - cvRound(rHist.at<float>(i))), Scalar(0, 0, 255));
+	}
+
+	imshow("Source image", src);
+	imshow("Histogram", histImg);
+	waitKey(0);
+
+	return 0;
+}
