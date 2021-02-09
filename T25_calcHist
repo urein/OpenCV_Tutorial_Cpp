@@ -4,19 +4,18 @@ using namespace std;
 using namespace cv;
 
 /*
-直方图H(i)：图像像素值的分布
-当图像的像素值分布都聚集在一起时，说明图像整体看上去都一样，即对比度很低。
+图像直方图是计算像素值的分布。但直方图所统计的不限于像素值，比如可以是其它任意的特征，像梯度等(HOG特征)。
+直方图有几个概念：
+	1. dims：想要统计的参数量。如果只是图像直方图，统计量只有像素值，因此dims=1。
+	   如果想要统计两个参数，则直方图是3D的。x和y方向分别表示两个特征，z表示统计值。
+	2. bins：分块数量，比如像素的范围是0-255，此此时bins就可以是256
+	3. range：待统计参数的范围，比如[0, 255]
 
-直方图均衡化：把直方图拉长，让像素值的分布更为均匀，以此来提升图像的对比度。
-
-方式：通过累计分布函数cdf进行映射(accumulative distribution function)
-H'(i) = Σ H(j) for all 0<=j<i
-对于原图像的每一个像素src(x, y)，处理后的像素为 equalized(x, y) = H'(src(x, y))
 */
 
 /*
-calcHist参数：
-	
+主要接口：calcHist
+参数：	
 	const Mat* images：输入图像，这里只有单通道的一张图。如果是多张可以以序列的形式输入
 	int images：输入图像数目
 	const int* channels：待测量的每张图的通道数，从0开始计数
@@ -27,6 +26,14 @@ calcHist参数：
 	const float* ranges：直方图每个维度下测量数据的范围
 	bool uniform：bin的个数都是一样的，默认为True 
 	bool accumulate：直方图在一开始是空的，默认为False
+*/
+
+/*
+该实例的主要流程：
+	1. 加载图像
+	2. 将图像拆分成RGB三个通道
+	3. 调用calcHist计算每个通道的直方图，并将值标准化（0 — 直方图的高度）
+	4. 将三个通道的直方图曲线绘制在一张图上
 */
 
 
