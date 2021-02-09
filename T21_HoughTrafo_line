@@ -1,0 +1,48 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+
+/*
+霍夫变换的前提条件：
+边缘像素已经被检测出来了(Canny)
+输入图像必须是8-bit灰度图
+*/
+
+
+int main()
+{
+	Mat src = imread("./images/lines.png");
+
+	Mat grayImg;
+	cvtColor(src, grayImg, COLOR_BGR2GRAY);
+	
+	Canny(grayImg, grayImg, 100, 200);
+	imshow("Canny Edges", grayImg);
+
+	// 保存霍夫变换的结果
+	vector<Vec4f> plines;  // Vec4f包含4个浮点数，表示构成直线的两个点的坐标
+	// rho表示生成极坐标时的像素扫描步长，一般取1
+	// theta表示生成极坐标时的角度步长，一般取CV_PI/180.0
+	// threshold表示只有获得足够交点极坐标点才被看成直线
+	HoughLinesP(grayImg, plines, 1, CV_PI / 180.0, 10, 0, 0);  // 得到的线条如果不连续，就把最后一个参数变大
+
+	// 把直线画出来
+	Mat dst;
+	cvtColor(grayImg, dst, COLOR_GRAY2BGR);
+	Scalar color = Scalar(0, 0, 255);
+	for (size_t i = 0; i != plines.size(); ++i)
+	{
+		Vec4f hline = plines[i];
+		line(src, Point(hline[0], hline[1]), Point(hline[2], hline[3]), color, 3);
+	}
+	imshow("lines", dst);
+	
+	waitKey(0);
+
+
+
+	return 0;
+}
+
