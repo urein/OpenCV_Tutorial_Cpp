@@ -1,0 +1,40 @@
+#include<opencv2/opencv.hpp>
+#include<iostream>
+using namespace std;
+using namespace cv;
+
+/*
+直方图H(i)：图像像素值的分布
+当图像的像素值分布都聚集在一起时，说明图像整体看上去都一样，即对比度很低。
+
+直方图均衡化：把直方图拉长，让像素值的分布更为均匀，以此来提升图像的对比度。
+
+方式：通过累计分布函数cdf进行映射(accumulative distribution function)
+H'(i) = Σ H(j) for all 0<=j<i
+对于原图像的每一个像素src(x, y)，处理后的像素为 equalized(x, y) = H'(src(x, y))
+*/
+
+
+int main()
+{
+	Mat src = imread("./images/low_contrast.jpg");
+	if (src.empty())
+	{
+		cout << "cannot open the image!" << endl;
+		return -1;
+	}
+	// 图太大，缩小一倍
+	resize(src, src, Size(), 0.5, 0.5);
+
+	// 输入必须为8位灰度图
+	cvtColor(src, src, COLOR_BGR2GRAY);
+	imshow("Source Image", src);
+
+	Mat dst;
+	equalizeHist(src, dst);
+
+	imshow("Equalized Image", dst);
+
+	waitKey(0);
+	return 0;
+}
